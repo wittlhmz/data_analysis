@@ -73,44 +73,44 @@ Die Boxplots zeigen deutliche Unterschiede in der Popularitätsverteilung zwisch
 
 ## Regression
 
-In meinem anderen Datenprojekt hätte es kaum Sinn gemacht auf die Regression einzugehen, weil die Daten sehr wenige Features hatten, die dann zum Teil auch wenig Aussagekraft haben. 
+In meinem anderen Datenprojekt hätte es kaum Sinn gemacht auf die Regression einzugehen, weil die Daten sehr wenige Features hatten, die dann zum Teil auch wenig Aussagekraft haben.
 
 | Modell | Features | MAE | R² | Laufzeit |
 |---|---|---|---|---|
 | Lineare Regression | `year`, `is_rock` | 14,56 | 0,0095 | 0,030 s |
 | SGD Regressor | 13 Features (Audio + Artist) | 12,79 | 0,1663 | 2,798 s |
 
-### Modellvergleich
+### Lineare Regression – Rock-Songs über die Zeit
 
 <p align="center">
-  <img src="outputs/02_model_comparison.png" width="800"/>
+  <img src="outputs/02_rock_trend.png" width="800"/>
 </p>
 
-Die lineare Regression mit nur zwei Merkmalen (`year` und `is_rock`) liefert erwartungsgemäß schwache Ergebnisse: Ein R² von 0,0095 bedeutet, dass das Modell weniger als 1 % der Varianz in der Popularität erklärt. Der SGD Regressor mit 13 Features – darunter alle Audio-Features sowie `avg_artist_popularity` und `total_artist_followers` – verbessert den MAE von 14,56 auf 12,79 und erreicht ein R² von 0,167. Das zeigt, dass Audio-Merkmale allein die Popularität nur begrenzt erklären können; der Bekanntheitsgrad des Künstlers ist der dominierende Faktor.
+Die Regressionsgerade zeigt, dass die Anzahl an Rock-Songs im Datensatz über die Jahrzehnte stark zugenommen hat – von wenigen hundert Einträgen in den 1960ern bis zu mehreren tausend pro Jahr ab den 2000ern. Das R² der Trendlinie liegt bei 0,72, was auf einen klar linearen Wachstumstrend hindeutet. Ab etwa 2010 flacht die Kurve leicht ab, was auf eine Sättigung im Rock-Segment oder eine veränderte Genrestruktur auf Spotify hindeuten kann. Die Steigung der Geraden lässt sich direkt aus dem Regressionskoeffizienten ablesen: Pro Jahr kommen im Schnitt mehrere hundert Rock-Songs hinzu.
 
 ---
 
-### Vorhergesagt vs. Tatsächlich
+### SGD Regressor – Vorhergesagt vs. Tatsächlich
 
 <p align="center">
   <img src="outputs/02_predicted_vs_actual.png" width="800"/>
 </p>
 
-Der Streuplot zeigt die Schwäche beider Modelle deutlich: Die Vorhersagen streuen stark um die Ideallinie und tendieren zur Mitte des Wertebereichs. Sehr populäre Songs (Werte über 70) werden systematisch unterschätzt, Songs mit Popularität 0 werden überschätzt. Das liegt an der stark schiefen Zielverteilung – 27 % der Songs haben Popularität 0. Der SGD Regressor zeigt eine etwas bessere Streuung um die Diagonale, bleibt aber ebenfalls weit von einer präzisen Vorhersage entfernt. Für bessere Ergebnisse wären Ensemble-Methoden wie Random Forest oder Gradient Boosting nötig.
+Der SGD Regressor nutzt 13 Features – alle Audio-Merkmale sowie `avg_artist_popularity` und `total_artist_followers` – um die Popularität vorherzusagen. Im Streuplot zeigt sich, dass die Vorhersagen zur Mitte des Wertebereichs tendieren: sehr populäre Songs werden systematisch unterschätzt, Songs mit Popularität 0 überschätzt. Das liegt an der stark schiefen Zielverteilung – 27 % der Songs haben Popularität 0. Mit einem R² von 0,167 erklärt das Modell immerhin 17 % der Varianz, was für eine reine Audio-Feature-Basis beachtlich ist.
 
 ---
 
-### Feature-Gewichte des SGD Regressors
+### SGD Regressor – Feature-Gewichte
 
 <p align="center">
   <img src="outputs/02_sgd_feature_weights.png" width="800"/>
 </p>
 
-Die Feature-Gewichte des SGD Regressors bestätigen die Korrelationsanalyse aus Schritt 1: `avg_artist_popularity` hat mit Abstand den größten positiven Einfluss auf die vorhergesagte Popularität. `instrumentalness` wirkt sich negativ aus – rein instrumentale Songs erzielen im Schnitt geringere Popularitätswerte. `year` hat ein negatives Gewicht, was zunächst überraschend wirkt, aber durch den Recency-Bias in den Rohdaten relativiert wird. Audio-Features wie `danceability`, `energy` und `valence` haben moderate positive Gewichte.
+Die Feature-Gewichte bestätigen die Korrelationsanalyse aus der Exploration: `avg_artist_popularity` hat mit Abstand den größten positiven Einfluss auf die vorhergesagte Popularität – der Bekanntheitsgrad des Künstlers schlägt alle Audio-Merkmale. `instrumentalness` wirkt sich negativ aus, rein instrumentale Songs erzielen im Schnitt geringere Popularitätswerte. Audio-Features wie `danceability`, `energy` und `valence` haben moderate positive Gewichte und liefern dennoch einen messbaren Beitrag zur Vorhersage.
 
 ---
 
-## Schritt 3 – Classification
+## Classification
 
 Ziel: Das **Genre** eines Songs aus seinen Audio-Features vorhersagen. Verwendet werden die Top-8-Genres (522.473 Songs). Da Rock mit ~38 % stark überrepräsentiert ist, wird `class_weight="balanced"` eingesetzt.
 
@@ -119,7 +119,7 @@ Ziel: Das **Genre** eines Songs aus seinen Audio-Features vorhersagen. Verwendet
 | LinearSVC | 0,4852 | 0,4422 | 15,18 s |
 | SGD Classifier | 0,4685 | 0,4378 | 3,80 s |
 
-### Modellvergleich
+### LinearSVC – Modellvergleich
 
 <p align="center">
   <img src="outputs/03_model_comparison.png" width="800"/>
