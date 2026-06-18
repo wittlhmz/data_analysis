@@ -6,7 +6,7 @@
 ![Status](https://img.shields.io/badge/Status-abgeschlossen-brightgreen)
 
 Dieses Projekt analysiert einen Spotify-Datensatz mit **550.622 Songs** und ihren Audio-Features mithilfe von Python und scikit-learn.
-Ziel ist es, Muster in Musikdaten sichtbar zu machen und maschinelles Lernen einzusetzen, um Popularität vorherzusagen und Genres zu klassifizieren.
+Ziel ist es, dass ich lerne, wie man auch mit großen Datensätzen umgeht, aber auch wie man Ergebnisse interpretiert. Bei meinem ersten Projekt (https://github.com/wittlhmz/audio_analysis) hatte ich einen sehr kleinen Datensatz und zudem waren die Erkenntnisse nicht besonders spannend.
 
 ---
 
@@ -23,46 +23,13 @@ Ziel ist es, Muster in Musikdaten sichtbar zu machen und maschinelles Lernen ein
 **Audio-Features:** `danceability`, `energy`, `loudness`, `speechiness`, `acousticness`, `instrumentalness`, `liveness`, `valence`, `tempo`  
 **Metadaten:** `name`, `artists`, `album_name`, `genre`, `year`, `popularity`, `total_artist_followers`, `avg_artist_popularity`
 
----
-
-## Projektstruktur
-
-```
-├── data/
-│   └── songs.csv
-├── database/
-│   └── spotify.db          ← generierte SQLite-Datenbank
-├── outputs/
-│   └── *.png               ← alle Grafiken
-├── src/
-│   ├── 00_csv_to_db.py
-│   ├── 01_explore.py
-│   ├── 02_regression.py
-│   └── 03_classification.py
-└── README.md
-```
+Zunächst habe ich bei diesem Datensatz die `lyrics`-Spalte weggelassen, da die Songtexte für meine Analyse irrelevant waren und die Dateigröße der Datenbank damit um ca. 80% reduziert wurde.
 
 ---
 
-## Lokal ausführen
+## Exploration & Visualisierung
 
-```bash
-pip install scikit-learn pandas numpy matplotlib seaborn
-python src/00_csv_to_db.py
-python src/01_explore.py
-python src/02_regression.py
-python src/03_classification.py
-```
-
----
-
-## Schritt 0 – CSV → SQLite
-
-Die rohe CSV-Datei wird eingelesen und in eine SQLite-Datenbank überführt. Dabei wird die `lyrics`-Spalte weggelassen, da sie für die Audio-Analyse irrelevant ist und die Dateigröße um ~80 % reduziert. Alle weiteren Schritte lesen ausschließlich aus der Datenbank.
-
----
-
-## Schritt 1 – Exploration & Visualisierung
+Bei einem so großen Datensatz macht es Sinn, dass man sich erstmal mit dem Datensatz vertraut macht und ein paar Verteilungen visualisiert, im Folgenden sind einige mehr oder weniger interessante Fakten visualisiert.
 
 ### Popularitätsverteilung & Top-Genres
 
@@ -104,19 +71,9 @@ Die Boxplots zeigen deutliche Unterschiede in der Popularitätsverteilung zwisch
 
 ---
 
-### Popularität über die Jahre
+## Regression
 
-<p align="center">
-  <img src="outputs/01_popularity_over_years.png" width="800"/>
-</p>
-
-Die durchschnittliche Popularität steigt mit dem Erscheinungsjahr deutlich an. Ältere Songs aus den 1960er und 1970er Jahren haben auf Spotify strukturell niedrigere Werte, weil der Algorithmus aktuelle Hördaten bevorzugt und ältere Tracks seltener empfohlen werden. Songs ab 2015 zeigen die höchsten Durchschnittswerte – hier spielt auch der Effekt mit, dass neuere Releases zu Beginn algorithmisch gepusht werden. Dieses Muster ist bei der Regressionsmodellierung wichtig: `year` sollte als Feature aufgenommen werden, auch wenn seine Popularitätskorrelation mit r = −0,07 gering erscheint.
-
----
-
-## Schritt 2 – Regression
-
-Ziel: Die **Popularität** (0–100) eines Songs vorhersagen. Verglichen werden zwei Modelle mit unterschiedlicher Merkmalsbasis.
+In meinem anderen Datenprojekt hätte es kaum Sinn gemacht auf die Regression einzugehen, weil die Daten sehr wenige Features hatten, die dann zum Teil auch wenig Aussagekraft haben. 
 
 | Modell | Features | MAE | R² | Laufzeit |
 |---|---|---|---|---|

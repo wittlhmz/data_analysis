@@ -133,6 +133,41 @@ fig.savefig(OUT / "02_model_comparison.png", dpi=150)
 plt.close(fig)
 print("Gespeichert: 02_model_comparison.png")
 
+# --- Plot 1b: Rock-Songs pro Jahr mit Regressionsgerade ---
+rock_per_year = (
+    df[df["is_rock"] == 1]
+    .groupby("year")
+    .size()
+    .reset_index(name="count")
+)
+rock_per_year = rock_per_year[(rock_per_year["year"] >= 1960) & (rock_per_year["year"] <= 2023)]
+
+X_yr = rock_per_year["year"].values.reshape(-1, 1)
+y_yr = rock_per_year["count"].values
+lr_trend = LinearRegression()
+lr_trend.fit(X_yr, y_yr)
+y_trend = lr_trend.predict(X_yr)
+slope = lr_trend.coef_[0]
+r2_trend = r2_score(y_yr, y_trend)
+
+fig, ax = plt.subplots(figsize=(12, 5))
+ax.bar(rock_per_year["year"], rock_per_year["count"],
+       color="#185FA5", alpha=0.5, label="Rock-Songs pro Jahr")
+ax.plot(rock_per_year["year"], y_trend,
+        color="#D85A30", linewidth=2.5,
+        label=f"Regressionsgerade  (Steigung: {slope:+.0f} Songs/Jahr, R²={r2_trend:.3f})")
+ax.set_xlabel("Jahr")
+ax.set_ylabel("Anzahl Rock-Songs")
+ax.set_title("Lineare Regression: Anzahl Rock-Songs über die Zeit")
+ax.legend(fontsize=10)
+ax.spines[["top", "right"]].set_visible(False)
+ax.yaxis.grid(True, linestyle="--", alpha=0.4)
+ax.set_axisbelow(True)
+fig.tight_layout()
+fig.savefig(OUT / "02_rock_trend.png", dpi=150)
+plt.close(fig)
+print("Gespeichert: 02_rock_trend.png")
+
 # --- Plot 2: Vorhergesagt vs. Tatsächlich (beide Modelle) ---
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
 sample = np.random.default_rng(RANDOM_STATE).integers(0, len(y_test), 3000)
