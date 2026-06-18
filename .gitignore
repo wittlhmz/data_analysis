@@ -1,6 +1,5 @@
 data/
 database/
-outputs/
 venv/
 AGENTS.md
 .claude/
