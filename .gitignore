@@ -1,0 +1,14 @@
+data/
+database/
+outputs/
+venv/
+AGENTS.md
+.claude/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.tsv
+*.csv
+settings.local.json
